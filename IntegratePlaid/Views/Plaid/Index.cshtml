@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewData["Title"] = "Plaid";
+}
+
+<h1>Plaid Integration</h1>
+
+<button id="plaid-button">Link your accounts via Plaid</button>
+<br />
+<br />
+<label>Public Token: </label>
+<input type="text" id="plaid-public_token" size="200"/>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+    <script>
+        var handler = Plaid.create({
+            clientName: 'Wealthlane',
+            user: {
+                client_user_id: 'anaya_upadhyay',
+            },
+            env: 'sandbox',
+            token: '@ViewBag.LinkToken',
+            product: ['auth', 'identity', "transactions", "assets", "liabilities", "investments", "transfer"],
+            selectAccount: true, // Optional – trigger the Select Account
+            onLoad: function() {
+            // Optional, called when Link loads
+            },
+            onSuccess: function(public_token, metadata) {
+                console.log('Success!');
+                console.log(public_token);
+                $("#plaid-public_token").val(public_token);
+                console.log(metadata);
+            },
+            onExit: function(err, metadata) {
+            // The user exited the Link flow.
+            if (err != null) {
+                // The user encountered a Plaid API error prior to exiting.
+                console.log('Error :');
+                console.log(err);
+                console.log('Metadata :');
+                console.log(metadata);
+            }
+            // metadata contains information about the institution
+            // that the user selected and the most recent API request IDs.
+            // Storing this information can be helpful for support.
+            }
+        });
+
+        $("#plaid-button").click(function(){
+            //alert("You clicked a button");
+            console.log("Inside Click Event of plaid-button");
+            handler.open('ins_1');
+        });               
+    </script>
+}
