@@ -10,11 +10,14 @@
 <br />
 <label>Public Token: </label>
 <input type="text" id="plaid-public_token" size="200"/>
+<div id="plaid-accounts" style="margin-top: 10px;"></div>
 
 @section Scripts{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
     <script>
+            document.getElementById('plaid-accounts').innerHTML = "Anaya Upadhyay";
+
         /*
             var r = ["actionLog", "apiRequestId", "apiVersion", "browserLanguage", "clientName", "configLanguage", "configCountryCodes", "createToOnLoadInterval", "createToOpenInterval", "currentPane", "ddtaSurveyQuestion", "ddtaSurveySelection", "ddtaSurveyPreviousPane", "didConsent", "env", "experimentVariants", "exitStatus", "hasUserEmailAddress", "hasUserLegalName", "hasUserPhoneNumber", "institutionButtonIndex", "institutionName", "institutionColorPrimary", "institutionSearchIsVisible", "institutionSearchQueryLog", "institutionSearchResults", "institutionType", "interstitial_consent", "isCustomInitializer", "isCustomInitializerEnabled", "isEmbedded", "isMatchedUser", "isMobile", "isParentInlineStylesheetSupported", "isParentMetaViewportSet", "isPatch", "isRestrictedWebview", "isSimpleIntegration", "isUsingOnEventCallback", "isUsingOnExitCallback", "isUsingOnLoadCallback", "isWebview", "itemStatus", "linkClientGetDuration", "linkjsDuration", "linkOpenId", "linkPersistentId", "linkRequestId", "linkSessionId", "linkToken", "longtailAuthEnabled", "microdeposits_ach_provider", "openDurationMS", "parentMetaViewport", "patchPublicToken", "plaidClientName", "products", "productsEnabled", "previousPane", "publicKey", "publicToken", "searchResultIndex", "selectAccount", "statusCode", "useSandbox", "vendorjsDuration", "webhook"];
         */
@@ -35,6 +38,14 @@
                 console.log(public_token);
                 $("#plaid-public_token").val(public_token);
                 console.log(metadata);
+
+                var accountsData = "<b><u>Linked Account Information</u></b><br />" +
+                                   "Account Id = " + metadata.account.id +
+                                   "<br />A/c Name = " + metadata.account.name + 
+                                   "<br />A/c Type = " + metadata.account.subtype + 
+                                   "<br />Bank Name = " + metadata.institution.name;
+
+                document.getElementById('plaid-accounts').innerHTML = accountsData;
             },
             onExit: function(err, metadata) {
             // The user exited the Link flow.
