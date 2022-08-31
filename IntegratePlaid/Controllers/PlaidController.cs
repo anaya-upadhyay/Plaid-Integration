@@ -40,7 +40,7 @@ namespace IntegratePlaid.Controllers
                 user = new PlaidUser { client_user_id = "Anaya Upadhyay" },
                 products = new List<string> { "auth" },
 
-                // Comment the following line if you don't want to use Micro-Deposit
+                // Un-omment the following line if you want to use Micro-Deposit
                 //auth = new LinkAuth { same_day_microdeposits_enabled = true, auth_type_select_enabled = true }
             };
 
