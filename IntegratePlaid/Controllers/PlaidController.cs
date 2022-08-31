@@ -38,7 +38,10 @@ namespace IntegratePlaid.Controllers
                 country_codes = new List<string> { "US" },
                 language = "en",
                 user = new PlaidUser { client_user_id = "Anaya Upadhyay" },
-                products = new List<string> { "auth", "identity", "transactions"}
+                products = new List<string> { "auth" },
+
+                // Comment the following line if you don't want to use Micro-Deposit
+                //auth = new LinkAuth { same_day_microdeposits_enabled = true, auth_type_select_enabled = true }
             };
 
             request.AddJsonBody(param);
@@ -63,6 +66,11 @@ namespace IntegratePlaid.Controllers
             public string language { get; set; }
             public PlaidUser user { get; set; }
             public List<string> products { get; set; }
+            /// <summary>
+            /// Add the following property for Micro-Deposit.
+            /// This is supported only on ["auth"] product.
+            /// </summary>
+            public LinkAuth auth { get; set; }
         }
 
         internal class PlaidUser
@@ -82,6 +90,15 @@ namespace IntegratePlaid.Controllers
             public string expiration { get; set; }
             public string link_token { get; set; }
             public string request_id { get; set; }
+        }
+
+        /// <summary>
+        /// For Micro-Deposit
+        /// </summary>
+        internal class LinkAuth
+        {
+            public bool same_day_microdeposits_enabled { get; set; }
+            public bool auth_type_select_enabled { get; set; }
         }
     }
 }
