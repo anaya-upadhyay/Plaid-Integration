@@ -15,6 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
     <script>
+        /*
+            var r = ["actionLog", "apiRequestId", "apiVersion", "browserLanguage", "clientName", "configLanguage", "configCountryCodes", "createToOnLoadInterval", "createToOpenInterval", "currentPane", "ddtaSurveyQuestion", "ddtaSurveySelection", "ddtaSurveyPreviousPane", "didConsent", "env", "experimentVariants", "exitStatus", "hasUserEmailAddress", "hasUserLegalName", "hasUserPhoneNumber", "institutionButtonIndex", "institutionName", "institutionColorPrimary", "institutionSearchIsVisible", "institutionSearchQueryLog", "institutionSearchResults", "institutionType", "interstitial_consent", "isCustomInitializer", "isCustomInitializerEnabled", "isEmbedded", "isMatchedUser", "isMobile", "isParentInlineStylesheetSupported", "isParentMetaViewportSet", "isPatch", "isRestrictedWebview", "isSimpleIntegration", "isUsingOnEventCallback", "isUsingOnExitCallback", "isUsingOnLoadCallback", "isWebview", "itemStatus", "linkClientGetDuration", "linkjsDuration", "linkOpenId", "linkPersistentId", "linkRequestId", "linkSessionId", "linkToken", "longtailAuthEnabled", "microdeposits_ach_provider", "openDurationMS", "parentMetaViewport", "patchPublicToken", "plaidClientName", "products", "productsEnabled", "previousPane", "publicKey", "publicToken", "searchResultIndex", "selectAccount", "statusCode", "useSandbox", "vendorjsDuration", "webhook"];
+        */
         var handler = Plaid.create({
             clientName: 'Wealthlane',
             user: {
@@ -22,7 +25,7 @@
             },
             env: 'sandbox',
             token: '@ViewBag.LinkToken',
-            product: ['auth', 'identity', "transactions", "assets", "liabilities", "investments", "transfer"],
+            product: ['auth', 'identity', 'transactions', 'assets', 'liabilities', 'investments'],
             selectAccount: true, // Optional – trigger the Select Account
             onLoad: function() {
             // Optional, called when Link loads
