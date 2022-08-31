@@ -38,7 +38,7 @@ namespace IntegratePlaid.Controllers
                 country_codes = new List<string> { "US" },
                 language = "en",
                 user = new PlaidUser { client_user_id = "Anaya Upadhyay" },
-                products = new List<string> { "auth" }
+                products = new List<string> { "auth", "identity", "transactions"}
             };
 
             request.AddJsonBody(param);
