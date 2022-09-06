@@ -16,6 +16,9 @@ namespace IntegratePlaid.Controllers
         private readonly ILogger<PlaidController> _logger;
         private readonly PlaidSettingsConfiguration _plaidSettings;
 
+        private const string PLAID_SANDBOX = "sandbox";
+        private const string PLAID_DEVELEOPMENT = "development";
+
         public PlaidController(ILogger<PlaidController> logger,
                                IOptions<PlaidSettingsConfiguration> options)
         {
@@ -25,15 +28,16 @@ namespace IntegratePlaid.Controllers
 
         public IActionResult Index()
         {
-            var client = new RestClient(_plaidSettings.LinkTokenURL);
+            var client = new RestClient(_plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.LinkTokenURL : _plaidSettings.DevTokenURL);
+                        
             var request = new RestRequest();
             request.Method = Method.Post;
             request.AddHeader("Content-Type", "application/json");
 
             var param = new PlaidParams
             {
-                client_id = _plaidSettings.ClientId,
-                secret = _plaidSettings.ClientSecret,
+                client_id = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientId: _plaidSettings.DevClientId,
+                secret = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientSecret: _plaidSettings.DevSecret,
                 client_name = "Wealthlane",
                 country_codes = new List<string> { "US" },
                 language = "en",
@@ -53,6 +57,8 @@ namespace IntegratePlaid.Controllers
                 var result = JsonConvert.DeserializeObject<LinkResponse>(response.Content);
                 ViewBag.LinkToken = result.link_token;
             }
+
+            ViewBag.Environment = _plaidSettings.Environment;
 
             return View();
         }

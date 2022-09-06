@@ -17,7 +17,7 @@
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
     <script>
             document.getElementById('plaid-accounts').innerHTML = "Anaya Upadhyay";
-
+            let accountsData = "";
         /*
             var r = ["actionLog", "apiRequestId", "apiVersion", "browserLanguage", "clientName", "configLanguage", "configCountryCodes", "createToOnLoadInterval", "createToOpenInterval", "currentPane", "ddtaSurveyQuestion", "ddtaSurveySelection", "ddtaSurveyPreviousPane", "didConsent", "env", "experimentVariants", "exitStatus", "hasUserEmailAddress", "hasUserLegalName", "hasUserPhoneNumber", "institutionButtonIndex", "institutionName", "institutionColorPrimary", "institutionSearchIsVisible", "institutionSearchQueryLog", "institutionSearchResults", "institutionType", "interstitial_consent", "isCustomInitializer", "isCustomInitializerEnabled", "isEmbedded", "isMatchedUser", "isMobile", "isParentInlineStylesheetSupported", "isParentMetaViewportSet", "isPatch", "isRestrictedWebview", "isSimpleIntegration", "isUsingOnEventCallback", "isUsingOnExitCallback", "isUsingOnLoadCallback", "isWebview", "itemStatus", "linkClientGetDuration", "linkjsDuration", "linkOpenId", "linkPersistentId", "linkRequestId", "linkSessionId", "linkToken", "longtailAuthEnabled", "microdeposits_ach_provider", "openDurationMS", "parentMetaViewport", "patchPublicToken", "plaidClientName", "products", "productsEnabled", "previousPane", "publicKey", "publicToken", "searchResultIndex", "selectAccount", "statusCode", "useSandbox", "vendorjsDuration", "webhook"];
         */
@@ -26,10 +26,12 @@
             user: {
                 client_user_id: 'anaya_upadhyay',
             },
-            env: 'sandbox',
+            //env: 'sandbox',
+            env: '@ViewBag.Environment',
             token: '@ViewBag.LinkToken',
-            product: ['auth', 'identity', 'transactions', 'assets', 'liabilities', 'investments'],
-            selectAccount: true, // Optional – trigger the Select Account
+            //product: ['auth', 'identity', 'transactions', 'assets', 'liabilities', 'investments'],
+            product: ['auth'],
+            //selectAccount: true, // Optional – trigger the Select Account
             onLoad: function() {
             // Optional, called when Link loads
             },
@@ -39,13 +41,26 @@
                 $("#plaid-public_token").val(public_token);
                 console.log(metadata);
 
-                var accountsData = "<b><u>Linked Account Information</u></b><br />" +
-                                   "Account Id = " + metadata.account.id +
-                                   "<br />A/c Name = " + metadata.account.name + 
-                                   "<br />A/c Type = " + metadata.account.subtype + 
-                                   "<br />Bank Name = " + metadata.institution.name;
+                //var accountsData = "<b><u>Linked Account Information</u></b><br />" +
+                //                   "Account Id = " + metadata.account.id +
+                //                   "<br />A/c Name = " + metadata.account.name + 
+                //                   "<br />A/c Type = " + metadata.account.subtype + 
+                //                   "<br />Bank Name = " + metadata.institution.name;
+
+                //document.getElementById('plaid-accounts').innerHTML = accountsData;
+
+                accountsData = "<b><u>Linked Account Information</u></b><br />";
+
+                for(let i = 0; i < metadata.accounts.length; i++){
+                    accountsData += "Account Id = " + metadata.accounts[i].id +
+                                    "<br />A/c Type = " + metadata.accounts[i].subtype + 
+                                    "<br />A/c Name = " + metadata.accounts[i].name + 
+                                    "<br />Bank Name = " + metadata.accounts[i].name + "<br /><br />";
+                }
 
                 document.getElementById('plaid-accounts').innerHTML = accountsData;
+
+                accountsData = "";
             },
             onExit: function(err, metadata) {
             // The user exited the Link flow.
@@ -67,5 +82,6 @@
             console.log("Inside Click Event of plaid-button");
             handler.open('ins_1');
         });               
+
     </script>
 }
