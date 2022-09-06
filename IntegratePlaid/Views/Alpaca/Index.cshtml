@@ -1,0 +1,75 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Get Quotes</h1>
+<br />
+
+<form method="post" asp-controller="Alpaca" asp-action="Index">
+    <input type="text" id="txtSymbol" name="symbol" size="100"/>
+    <input type="submit" value="Submit" />
+    <br />
+    <br />
+    <table class="table table-hover table-bordered table-responsive" style="width:auto;">
+        <thead class="thead-dark">
+            <tr class="table-dark">
+                <th scope="col">Name</th>
+                <th scope="col">Data</th>
+            </tr>
+        </thead>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <th scope="row" style="width:32%;">@item.Name</th>
+                <td>
+                    <table class="table table-sm table-borderless table-responsive-sm" style="width:auto;">
+                        <tr>
+                            <th scope="row">Timestamp (t)</th>
+                            <td>@item.Data.Timestamp</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ask Exchange (ax)</th>
+                            <td>@item.Data.AskExchange</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ask Price (ap)</th>
+                            <td>@item.Data.AskPrice</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Ask Size (as)</th>
+                            <td>@item.Data.AskSize</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bid Exchange (bx)</th>
+                            <td>@item.Data.BidExchange</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bid Price (bp)</th>
+                            <td>@item.Data.BidPrice</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Bid Size (bs)</th>
+                            <td>@item.Data.BidSize</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Quote Conditions (c)</th>
+                            <td>
+                                @foreach (var condition in item.Data.QuoteConditions)
+                                {
+                                    @condition
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tape (z)</th>
+                            <td>@item.Data.Tape</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        }
+    </table>
+    
+</form>

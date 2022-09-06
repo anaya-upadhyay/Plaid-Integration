@@ -13,6 +13,7 @@ builder.Services.AddControllersWithViews();
 ConfigurationManager configuration = builder.Configuration;
 
 builder.Services.Configure<PlaidSettingsConfiguration>(configuration.GetSection("PlaidSettings"));
+builder.Services.Configure<AlpacaConfiguration>(configuration.GetSection("Alpaca"));
 
 // Add Swagger
 builder.Services.AddSwaggerGen(options =>
