@@ -44,8 +44,8 @@ namespace IntegratePlaid.Controllers
                 user = new PlaidUser { client_user_id = "Anaya Upadhyay" },
                 products = new List<string> { "auth" },
 
-                // Un-omment the following line if you want to use Micro-Deposit
-                //auth = new LinkAuth { same_day_microdeposits_enabled = true, auth_type_select_enabled = true }
+                // Un-comment the following line if you want to use Micro-Deposit
+                auth = new LinkAuth { same_day_microdeposits_enabled = true, auth_type_select_enabled = true }
             };
 
             request.AddJsonBody(param);
@@ -61,6 +61,74 @@ namespace IntegratePlaid.Controllers
             ViewBag.Environment = _plaidSettings.Environment;
 
             return View();
+        }
+
+        public IActionResult GetAccessToken(string publicToken)
+        {
+            var client = new RestClient(_plaidSettings.AccessTokenURL);
+
+            var request = new RestRequest();
+            request.Method = Method.Post;
+            request.AddHeader("Content-Type", "application/json");
+
+            var param = new AccessTokenParams
+            {
+                client_id = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientId : _plaidSettings.DevClientId,
+                secret = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientSecret : _plaidSettings.DevSecret,
+                public_token = publicToken
+            };
+
+            request.AddJsonBody(param);
+
+            var response = client.Execute(request);
+
+            if (response.IsSuccessful)
+            {
+                var result = JsonConvert.DeserializeObject<AccessTokenResponse>(response.Content);
+                
+                ViewBag.AccessToken = result.access_token;
+                ViewBag.NewEnvironment = _plaidSettings.Environment;
+             
+                var link_token = GenerateLinkTokenForVerification(ViewBag.AccessToken);
+
+                return Json(new { AccessToken = ViewBag.AccessToken, LinkToken = link_token });
+            }
+            else return BadRequest($"{response.StatusCode}: {response.Content}");
+        }
+
+        public string GenerateLinkTokenForVerification(string access_token)
+        {
+            var client = new RestClient(_plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.LinkTokenURL : _plaidSettings.DevTokenURL);
+
+            var request = new RestRequest();
+            request.Method = Method.Post;
+            request.AddHeader("Content-Type", "application/json");
+
+            var param = new PlaidParamsVerification
+            {
+                client_id = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientId : _plaidSettings.DevClientId,
+                secret = _plaidSettings.Environment is PLAID_SANDBOX ? _plaidSettings.ClientSecret : _plaidSettings.DevSecret,
+                client_name = "Wealthlane",
+                country_codes = new List<string> { "US" },
+                language = "en",
+                user = new PlaidUser { client_user_id = "Anaya Upadhyay" },
+                access_token = access_token,
+            };
+
+            request.AddJsonBody(param);
+
+            var response = client.Execute(request);
+
+            if (response.IsSuccessful)
+            {
+                var result = JsonConvert.DeserializeObject<LinkResponse>(response.Content);
+                ViewBag.VerifyToken = result.link_token;
+
+                return result.link_token;
+            }
+
+            ViewBag.Environment = _plaidSettings.Environment;
+            return "";
         }
 
         internal class PlaidParams
@@ -79,6 +147,18 @@ namespace IntegratePlaid.Controllers
             public LinkAuth auth { get; set; }
         }
 
+        internal class PlaidParamsVerification : PlaidParams
+        {
+            public string access_token { get; set; }
+        }
+
+        internal class AccessTokenParams
+        {
+            public string client_id { get; set; }
+            public string secret { get; set; }
+            public string public_token { get; set; }
+        }
+
         internal class PlaidUser
         {
             public string client_user_id { get; set; }
@@ -95,6 +175,13 @@ namespace IntegratePlaid.Controllers
         {
             public string expiration { get; set; }
             public string link_token { get; set; }
+            public string request_id { get; set; }
+        }
+
+        internal class AccessTokenResponse
+        {
+            public string access_token { get; set; }
+            public string item_id { get; set; }
             public string request_id { get; set; }
         }
 

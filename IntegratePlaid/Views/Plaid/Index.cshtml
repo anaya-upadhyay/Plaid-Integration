@@ -6,10 +6,16 @@
 <h1>Plaid Integration</h1>
 
 <button id="plaid-button">Link your accounts via Plaid</button>
+<button id="token-button">Get Access Token</button>
+<button id="verify-button">Verify Manually</button>
 <br />
 <br />
-<label>Public Token: </label>
-<input type="text" id="plaid-public_token" size="200"/>
+<input type="text" id="plaid-public_token" size="200" placeholder="Public Token" />
+<br /><br />
+<input type="text" id="plaid-access_token" size="200" placeholder="Access Token" />
+<br /><br />
+<input type="text" id="plaid-verify_token" size="200" placeholder="Verfication Link Token" />
+<br />
 <div id="plaid-accounts" style="margin-top: 10px;"></div>
 
 @section Scripts{
@@ -77,11 +83,79 @@
             }
         });
 
+        
+
         $("#plaid-button").click(function(){
             //alert("You clicked a button");
             console.log("Inside Click Event of plaid-button");
             handler.open('ins_1');
-        });               
+        });    
+        
+        $("#token-button").click(function(){
+            console.log("Get Access Token");
+            
+            $.ajax({
+                type: 'GET',
+                url: "/Plaid/GetAccessToken",
+                data: ({
+                    publicToken: $("#plaid-public_token").val()
+                }),
+                success: function(data){
+                    console.log(data);
+                    $("#plaid-access_token").val(data.accessToken);
+                    $("#plaid-verify_token").val(data.linkToken);
+                }
+            });
+        }); 
+
+        $("#verify-button").click(function(){
+            console.log("Inside Click Event of Verify Button");
+            
+                var verificationHandler = Plaid.create({
+                clientName: 'Wealthlane',
+                user: {
+                    client_user_id: 'anaya_upadhyay',
+                },
+                env: 'sandbox',
+                token: $("#plaid-verify_token").val(),
+                onLoad: function() {
+                },
+                onSuccess: function(public_token, metadata) {
+                    console.log('Success!');
+                    console.log(public_token);
+                    $("#plaid-public_token").val(public_token);
+                    console.log(metadata);
+
+                    accountsData = "<b><u>Linked Account Information</u></b><br />";
+
+                    for(let i = 0; i < metadata.accounts.length; i++){
+                        accountsData += "Account Id = " + metadata.accounts[i].id +
+                                        "<br />A/c Type = " + metadata.accounts[i].subtype + 
+                                        "<br />A/c Name = " + metadata.accounts[i].name + 
+                                        "<br />Bank Name = " + metadata.accounts[i].name + "<br /><br />";
+                    }
+
+                    document.getElementById('plaid-accounts').innerHTML = accountsData;
+
+                    accountsData = "";
+                },
+                onExit: function(err, metadata) {
+                // The user exited the Link flow.
+                if (err != null) {
+                    // The user encountered a Plaid API error prior to exiting.
+                    console.log('Error :');
+                    console.log(err);
+                    console.log('Metadata :');
+                    console.log(metadata);
+                }
+                // metadata contains information about the institution
+                // that the user selected and the most recent API request IDs.
+                // Storing this information can be helpful for support.
+                }
+            });
+
+            verificationHandler.open('ins_1');
+        });    
 
     </script>
 }
