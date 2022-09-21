@@ -13,6 +13,8 @@
         public string DevTokenURL { get; set; }
         public string DevClientId { get; set; }
         public string DevSecret { get; set; }
+
+        public string ProcessorTokenURL { get; set; }
     }
 
 }

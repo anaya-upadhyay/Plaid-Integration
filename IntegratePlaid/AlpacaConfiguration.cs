@@ -44,5 +44,11 @@
 
         public string ClientID2 { get; set; }
         public string ClientSecret2 { get; set; }
+
+        public string ACHRelationshipURL { get; set; }
+        public string BrokerAPISandbox { get; set; }
+        public string BrokerAPIProd { get; set; }
+        public string BrokerAPIKey { get; set; }
+        public string BrokerAPISecret { get; set; }
     }
 }

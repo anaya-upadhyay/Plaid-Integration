@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Plaid + Alpaca</h1>
+<h4>Use Alpaca with Plaid Auth to send and receive payments!</h4>
+<p><br /></p>
+<button id="plaid-button">Link your accounts via Plaid</button>
+<button id="token-button">Get Access Token</button>
+<button id="processor-button">Create Processor Token</button>
+<button id="relationship-button">Create Alpaca Relationship</button>
+
+<p><br /></p>
+
+<input type="text" id="plaid-public_token" size="200" placeholder="Public Token" />
+<input type="hidden" id="account_id" />
+<br /><br />
+<input type="text" id="plaid-access_token" size="200" placeholder="Access Token" />
+<br /><br />
+<input type="text" id="processor_token" size="200" placeholder="Processor Token" />
+
+<div id="plaid-accounts" style="margin-top: 10px;"></div>
+<div id="alpaca-relations" style="margin-top: 10px;"></div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+
+    <script>
+        const handler = Plaid.create({
+                token: '@ViewBag.LinkToken',
+                onSuccess: (public_token, metadata) => {
+
+                    console.log('Success!');
+                    console.log(public_token);
+                    
+                    $("#plaid-public_token").val(public_token);
+                    
+                    console.log(metadata);
+
+                    accountsData = "<b><u>Linked Account Information</u></b><br />";
+
+                    for(let i = 0; i < metadata.accounts.length; i++){
+                        accountsData += "Account Id = " + metadata.accounts[i].id +
+                                        "<br />A/c Type = " + metadata.accounts[i].subtype + 
+                                        "<br />A/c Name = " + metadata.accounts[i].name + 
+                                        "<br />Bank Name = " + metadata.accounts[i].name + "<br /><br />";
+                    }
+
+                    document.getElementById('plaid-accounts').innerHTML = accountsData;
+                    $("#account_id").val(metadata.account_id);
+                },
+                onLoad: () => {},
+                onExit: (err, metadata) => {},
+                onEvent: (eventName, metadata) => {},
+            });
+
+        $("#plaid-button").click(function(){
+                console.log("Inside Click Event of plaid-button");
+                handler.open();
+            });  
+
+        $("#token-button").click(function(){
+            console.log("Get Access Token");
+
+            $.ajax({
+                type: 'GET',
+                url: "/ACH/GetAccessToken",
+                data: ({
+                    publicToken: $("#plaid-public_token").val()
+                }),
+                success: function(data){
+                    console.log(data);
+                    $("#plaid-access_token").val(data.accessToken);
+                }
+            });
+        }); 
+
+        $("#processor-button").click(function(){
+            console.log("Create Processor Token");
+
+            $.ajax({
+                type: 'GET',
+                url: "/ACH/CreateProcessorToken",
+                data:({
+                    accessToken: $("#plaid-access_token").val(),
+                    accountId: $("#account_id").val()
+                }),
+                success: function(data){
+                    console.log(data);
+
+                    $("#processor_token").val(data.processor_token);
+                }
+            });
+        });
+
+        $("#relationship-button").click(function(){
+            console.log("Create Alpaca ACH Relationship");
+
+            $.ajax({
+                type: 'GET',
+                url: "/ACH/CreateAlpacaACHRelationship",
+                data:({
+                    processor_token: $("#processor_token").val(),
+                    account_id: $("#account_id").val()
+                }),
+                success: function(data){
+                    console.log(data);
+
+                    relationshipData = "<b><u>ACH Relationship Response</u></b>" +
+                                        "<br />id : " + data.id +
+                                        "<br />account_id : " + data.account_id +
+                                        "<br />created_at : " + data.created_at +
+                                        "<br />updated_at : " + data.updated_at +
+                                        "<br />status : " + data.status +
+                                        "<br />account_owner_name : " + data.account_owner_name +
+                                        "<br />nickname : " + data.nickname;
+                    
+                    document.getElementById('alpaca-relations').innerHTML = relationshipData;
+                }
+            });
+        });
+    </script>
+}
