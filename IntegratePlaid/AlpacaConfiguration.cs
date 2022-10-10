@@ -50,5 +50,7 @@
         public string BrokerAPIProd { get; set; }
         public string BrokerAPIKey { get; set; }
         public string BrokerAPISecret { get; set; }
+
+        public string AccountAPI { get; set; }
     }
 }
